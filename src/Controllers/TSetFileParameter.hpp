@@ -187,14 +187,14 @@ namespace fusevfs {
     // ────────────────────────────────────────────────────────────────
     class TSetInfoParent
         : public TSetInfoParameterMixin<
-              std::shared_ptr<rwl::TRwLock<TDirectory>>,
+              std::shared_ptr<read_write_lock::RWLock<TDirectory>>,
               TSetInfoParent>
     {
         using Base = TSetInfoParameterMixin<
-                         std::shared_ptr<rwl::TRwLock<TDirectory>>,
+                         std::shared_ptr<read_write_lock::RWLock<TDirectory>>,
                          TSetInfoParent>;
     public:
-        explicit TSetInfoParent(const std::shared_ptr<rwl::TRwLock<TDirectory>>& p)
+        explicit TSetInfoParent(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& p)
             : Base(p) {}
 
         using Base::operator();

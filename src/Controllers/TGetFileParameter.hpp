@@ -65,14 +65,14 @@ class TGetInfoMode : public TGetFileParameter<mode_t, TGetInfoMode> {
     }
 };
 
-class TGetInfoParent : public TGetFileParameter<std::weak_ptr<rwl::TRwLock<TDirectory>>, TGetInfoParent> {
+class TGetInfoParent : public TGetFileParameter<std::weak_ptr<read_write_lock::RWLock<TDirectory>>, TGetInfoParent> {
     public:
-    using TGetFileParameter<std::weak_ptr<rwl::TRwLock<TDirectory>>, TGetInfoParent>::operator();
+    using TGetFileParameter<std::weak_ptr<read_write_lock::RWLock<TDirectory>>, TGetInfoParent>::operator();
     TGetInfoParent()=default;
-    const std::weak_ptr<rwl::TRwLock<TDirectory>>& operator()(const CGuardFileObject auto& var) {
+    const std::weak_ptr<read_write_lock::RWLock<TDirectory>>& operator()(const CGuardFileObject auto& var) {
         return reinterpret_cast<const TFile<TDirectory>*>(var.GetPtr())->m_pParent;
     }
-    std::weak_ptr<rwl::TRwLock<TDirectory>>& operator()(CWriteGuardFileObject auto& var) {
+    std::weak_ptr<read_write_lock::RWLock<TDirectory>>& operator()(CWriteGuardFileObject auto& var) {
         return reinterpret_cast<TFile<TDirectory>*>(var.GetPtr())->m_pParent;
     }
 };

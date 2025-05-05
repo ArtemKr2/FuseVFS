@@ -1,5 +1,5 @@
 #pragma once
-#include <RwLock/TRwLock.hpp>
+#include <ReadWriteLock/RWLock.hpp>
 
 namespace fusevfs {
 
@@ -15,7 +15,7 @@ namespace fusevfs {
         mode_t m_uMode = 0;
         uid_t m_uUid = 0;
         gid_t m_uGid = 0;
-        std::weak_ptr<rwl::TRwLock<ParentType>> m_pParent;
+        std::weak_ptr<read_write_lock::RWLock<ParentType>> m_pParent;
     public:
         TFile()=default;
 

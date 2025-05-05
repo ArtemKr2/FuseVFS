@@ -6,13 +6,13 @@
 
 namespace fusevfs {
 
-static void Update(rwl::TRwLockWriteGuard<TLink>& writeObj, const std::filesystem::path& path) {
+static void Update(read_write_lock::RWLockWriteGuard<TLink>& writeObj, const std::filesystem::path& path) {
     writeObj->LinkTo = path;
 }
 
 template<typename T, typename... Args>
-static std::shared_ptr<rwl::TRwLock<T>> DoNew(const std::string& name, mode_t mode, const std::shared_ptr<rwl::TRwLock<TDirectory>>& parent, Args&& ... args) {
-    const auto obj = std::make_shared<rwl::TRwLock<T>>();
+static std::shared_ptr<read_write_lock::RWLock<T>> DoNew(const std::string& name, mode_t mode, const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& parent, Args&& ... args) {
+    const auto obj = std::make_shared<read_write_lock::RWLock<T>>();
     {
         auto objWrite = obj->Write();
         auto now  = std::chrono::system_clock::now();
@@ -45,15 +45,15 @@ static std::shared_ptr<rwl::TRwLock<T>> DoNew(const std::string& name, mode_t mo
     return obj;
 }
 
-std::shared_ptr<rwl::TRwLock<TDirectory>> TDirectory::New(const std::string& name, mode_t mode, const std::shared_ptr<rwl::TRwLock<fusevfs::TDirectory>>& parent) {
+std::shared_ptr<read_write_lock::RWLock<TDirectory>> TDirectory::New(const std::string& name, mode_t mode, const std::shared_ptr<read_write_lock::RWLock<fusevfs::TDirectory>>& parent) {
     return DoNew<TDirectory>(name, mode, parent);
 }
 
-std::shared_ptr<rwl::TRwLock<TRegularFile>> TRegularFile::New(const std::string& name, mode_t mode, const std::shared_ptr<rwl::TRwLock<fusevfs::TDirectory>>& parent) {
+std::shared_ptr<read_write_lock::RWLock<TRegularFile>> TRegularFile::New(const std::string& name, mode_t mode, const std::shared_ptr<read_write_lock::RWLock<fusevfs::TDirectory>>& parent) {
     return DoNew<TRegularFile>(name, mode, parent);
 }
 
-std::shared_ptr<rwl::TRwLock<TLink>> TLink::New(const std::string& name, mode_t mode, const std::shared_ptr<rwl::TRwLock<fusevfs::TDirectory>>& parent, const std::filesystem::path& path) {
+std::shared_ptr<read_write_lock::RWLock<TLink>> TLink::New(const std::string& name, mode_t mode, const std::shared_ptr<read_write_lock::RWLock<fusevfs::TDirectory>>& parent, const std::filesystem::path& path) {
     return DoNew<TLink>(name, mode, parent, path);
 }
 

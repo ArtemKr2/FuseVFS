@@ -3,22 +3,22 @@
 #include <memory>
 #include <type_traits>
 
-namespace rwl {
+namespace read_write_lock{
 
 template<typename T>
-class TRwLockGuardBase {
+class RWLockGuardBase {
     public:
     using InnerType = T;
 
     public:
-    TRwLockGuardBase(const std::shared_mutex* sharedMutex, const T* data)
+    RWLockGuardBase(const std::shared_mutex* sharedMutex, const T* data)
         :   m_pSharedMutex{const_cast<std::shared_mutex*>(sharedMutex)},
             m_pData{const_cast<T*>(data)} {}
-    ~TRwLockGuardBase()=default;
-    TRwLockGuardBase(const TRwLockGuardBase&)=delete;
-    TRwLockGuardBase& operator=(const TRwLockGuardBase&)=delete;
-    TRwLockGuardBase(TRwLockGuardBase&& other) noexcept { MoveInit(std::move(other)); }
-    TRwLockGuardBase& operator=(TRwLockGuardBase&& other) noexcept { MoveInit(std::move(other)); }
+    ~RWLockGuardBase()=default;
+    RWLockGuardBase(const RWLockGuardBase&)=delete;
+    RWLockGuardBase& operator=(const RWLockGuardBase&)=delete;
+    RWLockGuardBase(RWLockGuardBase&& other) noexcept { MoveInit(std::move(other)); }
+    RWLockGuardBase& operator=(RWLockGuardBase&& other) noexcept { MoveInit(std::move(other)); }
 
     public:
     inline const T* GetPtr() const { return this->m_pData; }
@@ -33,7 +33,7 @@ class TRwLockGuardBase {
     inline T& operator*() { return *this->m_pData; }
 
     protected:
-    void MoveInit(TRwLockGuardBase&& other) noexcept {
+    void MoveInit(RWLockGuardBase&& other) noexcept {
         m_pSharedMutex = other.m_pSharedMutex;
         m_pData = std::move(other.m_pData);
         other.m_pSharedMutex = nullptr;

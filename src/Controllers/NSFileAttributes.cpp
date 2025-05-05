@@ -16,15 +16,15 @@ namespace fusevfs::NSFileAttributes {
         out.tv_nsec = static_cast<long>(ns);
     }
 
-    void UpdateSize(const rwl::TRwLockReadGuard<TDirectory>&, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<TDirectory>&, struct stat* st) {
         st->st_size = 4096;
     }
 
-    void UpdateSize(const rwl::TRwLockReadGuard<TRegularFile>& varRead, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<TRegularFile>& varRead, struct stat* st) {
         st->st_size = static_cast<off_t>(varRead->Data.size());
     }
 
-    void UpdateSize(const rwl::TRwLockReadGuard<TLink>& varRead, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<TLink>& varRead, struct stat* st) {
         st->st_size = static_cast<off_t>(std::string_view(varRead->LinkTo.c_str()).size());
     }
 
@@ -64,7 +64,7 @@ namespace fusevfs::NSFileAttributes {
         {
             std::size_t subDirs = std::count_if(
                 rd->Files.begin(), rd->Files.end(),
-                [](auto& v){ return std::holds_alternative<std::shared_ptr<rwl::TRwLock<TDirectory>>>(v); });
+                [](auto& v){ return std::holds_alternative<std::shared_ptr<read_write_lock::RWLock<TDirectory>>>(v); });
             st->st_nlink = 2 + subDirs;
         }
         else

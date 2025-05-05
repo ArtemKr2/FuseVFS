@@ -12,7 +12,7 @@ namespace fusevfs {
 
 class TFileSystem {
 public:
-    static const std::shared_ptr<rwl::TRwLock<TDirectory>>& RootDir();
+    static const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& RootDir();
 
     static std::filesystem::path SocketPath;
 

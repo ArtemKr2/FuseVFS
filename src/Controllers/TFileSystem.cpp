@@ -1,6 +1,5 @@
 #include <thread>
 #include <cstring>
-#include <iostream>
 #include <span>
 #include <fstream>
 #include <sys/socket.h>
@@ -384,7 +383,7 @@ namespace fusevfs {
         }
     }
 
-    const std::shared_ptr<rwl::TRwLock<TDirectory>>& TFileSystem::RootDir() {
+    const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& TFileSystem::RootDir() {
         static auto s_pRootDir = TDirectory::New(s_sRootPath.data(), static_cast<mode_t>(0777), nullptr);
         return s_pRootDir;
     }
