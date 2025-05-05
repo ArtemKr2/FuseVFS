@@ -1,7 +1,7 @@
 #include <Controllers/TReadDirectory.hpp>
 #include <Controllers/TGetFileParameter.hpp>
 #include <Controllers/NSFindFile.hpp>
-#include <Exceptions/TFSException.hpp>
+#include <Exceptions/FSException.hpp>
 
 namespace fusevfs {
 
@@ -18,7 +18,7 @@ namespace fusevfs {
     }
 
     void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var) {
-        throw TFSException(m_pPath, NFSExceptionType::NotDirectory);
+        throw FSException(m_pPath, ExceptionTypeEnum::NotDirectory);
     }
 
     void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var) {

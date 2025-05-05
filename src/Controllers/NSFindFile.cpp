@@ -1,6 +1,6 @@
 #include <Controllers/NSFindFile.hpp>
 #include <Controllers/TFileSystem.hpp>
-#include <Exceptions/TFSException.hpp>
+#include <Exceptions/FSException.hpp>
 #include <Controllers/TGetFileParameter.hpp>
 #include <Controllers/NSAccessFile.hpp>
 
@@ -26,7 +26,7 @@ ASharedFileVariant RecursiveFind(const std::filesystem::path& path,
         }
     );
     if(childIt == files.end()) {
-        throw TFSException(path.begin(), it, NFSExceptionType::FileNotExist);
+        throw FSException(path.begin(), it, ExceptionTypeEnum::FileNotExist);
     }
     if(std::distance(it, path.end()) == 1) {
         return *childIt;
@@ -34,11 +34,11 @@ ASharedFileVariant RecursiveFind(const std::filesystem::path& path,
     if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<TDirectory>>>(&*childIt)) {
         const auto& childDir = *childDirPtr;
         if(NSAccessFile::Access(childDir, X_OK)==NNFileAccess::Restricted) {
-            throw TFSException(path.begin(), it, NFSExceptionType::AccessNotPermitted);
+            throw FSException(path.begin(), it, ExceptionTypeEnum::AccessNotPermitted);
         }
         return RecursiveFind(path, ++it, childDir->Read());
     }
-    throw TFSException(path.begin(), it, NFSExceptionType::NotDirectory);
+    throw FSException(path.begin(), it, ExceptionTypeEnum::NotDirectory);
 }
 
 void AddToNameHash(const std::filesystem::path& path) {
@@ -62,7 +62,7 @@ void RemoveFromNameHash(const std::filesystem::path& path) {
 const std::set<std::filesystem::path>& FindByName(const std::string& name) {
     auto namePathRead = s_mNamePath.Read();
     if(!namePathRead->contains(name)) {
-        throw TFSException(std::string_view(name), NFSExceptionType::FileNotExist);
+        throw FSException(std::string_view(name), ExceptionTypeEnum::FileNotExist);
     }
     return namePathRead->at(name);
 }
@@ -73,7 +73,7 @@ std::shared_ptr<read_write_lock::RWLock<T>> FindGeneral(const std::filesystem::p
     if(const auto t = std::get_if<std::shared_ptr<read_write_lock::RWLock<T>>>(&obj)) {
         return *t;
     }
-    throw TFSException(path.begin(), path.end(), FSExceptionValue);
+    throw FSException(path.begin(), path.end(), FSExceptionValue);
 }
 
 ASharedFileVariant Find(const std::filesystem::path& path) {
@@ -86,15 +86,15 @@ ASharedFileVariant Find(const std::filesystem::path& path) {
 }
 
 std::shared_ptr<read_write_lock::RWLock<TDirectory>> FindDir(const std::filesystem::path& path) {
-    return FindGeneral<TDirectory, NFSExceptionType::NotDirectory>(path);
+    return FindGeneral<TDirectory, ExceptionTypeEnum::NotDirectory>(path);
 }
 
 std::shared_ptr<read_write_lock::RWLock<TLink>> FindLink(const std::filesystem::path& path) {
-    return FindGeneral<TLink, NFSExceptionType::NotLink>(path);
+    return FindGeneral<TLink, ExceptionTypeEnum::NotLink>(path);
 }
 
 std::shared_ptr<read_write_lock::RWLock<TRegularFile>> FindRegularFile(const std::filesystem::path& path) {
-    return FindGeneral<TRegularFile, NFSExceptionType::NotFile>(path);
+    return FindGeneral<TRegularFile, ExceptionTypeEnum::NotFile>(path);
 }
 
 }

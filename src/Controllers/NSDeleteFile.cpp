@@ -3,7 +3,7 @@
 #include <Controllers/NSDeleteFile.hpp>
 #include <Controllers/TGetFileParameter.hpp>
 #include <Controllers/NSFindFile.hpp>
-#include <Exceptions/TFSException.hpp>
+#include <Exceptions/FSException.hpp>
 
 namespace fusevfs::NSDeleteFile {
 
@@ -41,7 +41,7 @@ void Delete(const std::filesystem::path& path) {
         }
     );
     if(it == parentFiles.end()) {
-        throw TFSException(path, NFSExceptionType::FileNotExist);
+        throw FSException(path, ExceptionTypeEnum::FileNotExist);
     }
     DeleteWithIterator(parentFiles, it, path);
 }

@@ -7,7 +7,6 @@
 #include <csignal>
 #include <thread>
 #include <chrono>
-#include <sys/stat.h>
 #include <fcntl.h>
 
 using namespace std::chrono_literals;

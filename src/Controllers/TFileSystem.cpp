@@ -13,7 +13,7 @@
 #include <Controllers/TReadDirectory.hpp>
 #include <Controllers/NSDeleteFile.hpp>
 #include <Controllers/NSAccessFile.hpp>
-#include <Exceptions/TFSException.hpp>
+#include <Exceptions/FSException.hpp>
 
 using namespace std::chrono_literals;
 
@@ -93,7 +93,7 @@ namespace fusevfs {
                 for (auto& p : results)
                     out += p.native() + "\n";
 
-            } catch(const TFSException& ex) {
+            } catch(const FSException& ex) {
                 out = "No files with such name\n";
             }
             ssize_t w = write(client, out.c_str(), out.size());
@@ -139,7 +139,7 @@ namespace fusevfs {
 
             return 0;
         }
-        catch(const TFSException& ex) {
+        catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -150,7 +150,7 @@ namespace fusevfs {
             const auto result = NSFindFile::Find(path);
             NSFileAttributes::Get(result, st);
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -168,7 +168,7 @@ namespace fusevfs {
             std::fill(bufferSpan.begin(), bufferSpan.end(), 0);
             std::copy(pathView.begin(), pathView.end(), bufferSpan.begin());
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -179,7 +179,7 @@ namespace fusevfs {
         const auto parentPath = newPath.parent_path();
         auto parentDir = NSFindFile::FindDir(parentPath);
         if(NSAccessFile::Access(parentDir, W_OK)==NFileAccess::Restricted) {
-            return NFSExceptionType::AccessNotPermitted;
+            return ExceptionTypeEnum::AccessNotPermitted;
         }
         T::New(newPath.filename(), mode, parentDir, args...);
         {
@@ -196,7 +196,7 @@ namespace fusevfs {
     int TFileSystem::MkNod(const char* path, mode_t mode, dev_t rdev) {
         try {
             return AddFile<TRegularFile>(path, mode);
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -204,7 +204,7 @@ namespace fusevfs {
     int TFileSystem::MkDir(const char* path, mode_t mode) {
         try {
             return AddFile<TDirectory>(path, mode);
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -220,7 +220,7 @@ namespace fusevfs {
                 TSetInfoChanged{now}(pw);      // ctime
             }
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -236,7 +236,7 @@ namespace fusevfs {
                 TSetInfoChanged{now}(pw);      // ctime
             }
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -245,7 +245,7 @@ namespace fusevfs {
         try {
             return AddFile<TLink>(link_path, 0777, target_path);
 
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -260,7 +260,7 @@ namespace fusevfs {
             TSetInfoChanged{ Clock::now() }(var);
 
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -280,7 +280,7 @@ namespace fusevfs {
                 TSetInfoChanged {now}(wr);
             }
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -289,7 +289,7 @@ namespace fusevfs {
         try {
             auto file = NSFindFile::FindRegularFile(path);
             if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==NFileAccess::Restricted) {
-                return NFSExceptionType::AccessNotPermitted;
+                return ExceptionTypeEnum::AccessNotPermitted;
             }
             {
                 auto wr = file->Write();
@@ -301,7 +301,7 @@ namespace fusevfs {
             const auto readSize = std::min(offsetSize, size);
             std::memcpy(buffer, fileRead->Data.data() + offset, readSize);
             return static_cast<int>(readSize);
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -315,7 +315,7 @@ namespace fusevfs {
             TSetInfoModified{now}(wr);
             TSetInfoChanged {now}(wr);
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -329,7 +329,7 @@ namespace fusevfs {
         try {
             auto file = NSFindFile::FindRegularFile(path);
             if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==NFileAccess::Restricted) {
-                return NFSExceptionType::AccessNotPermitted;
+                return ExceptionTypeEnum::AccessNotPermitted;
             }
             auto wr = file->Write();
             auto& data = wr->Data;
@@ -348,7 +348,7 @@ namespace fusevfs {
             TSetInfoChanged {now}(wr);
 
             return static_cast<int>(size);
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -357,7 +357,7 @@ namespace fusevfs {
         try {
             const int rc = NSAccessFile::AccessWithFuseFlags(path, info->flags);
             return rc;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -369,7 +369,7 @@ namespace fusevfs {
             TSetInfoAccessed{ Clock::now() }( dir );
             TReadDirectory{path, buffer, filler}();
             return 0;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }
@@ -378,7 +378,7 @@ namespace fusevfs {
         try {
             int rc = NSAccessFile::Access(path, accessMask);
             return rc;
-        } catch(const TFSException& ex) {
+        } catch(const FSException& ex) {
             return ex.Type();
         }
     }

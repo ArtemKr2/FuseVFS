@@ -3,8 +3,8 @@
 
 namespace fusevfs {
 
-namespace NNFSExceptionType {
-    enum NFSExceptionType {
+namespace ExceptionType {
+    enum ExceptionTypeEnum {
         AccessNotPermitted = -EACCES,
         FileNotExist = -ENOENT,
         NotDirectory = -ENOTDIR,
@@ -13,7 +13,7 @@ namespace NNFSExceptionType {
     };
 }
 
-using NFSExceptionType = NNFSExceptionType::NFSExceptionType;
+using ExceptionTypeEnum = ExceptionType::ExceptionTypeEnum;
 
 }
 
