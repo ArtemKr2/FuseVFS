@@ -1,4 +1,4 @@
-#include <Views/TFileSystemClientCLI.hpp>
+#include <Views/FSClientCLI.hpp>
 
 namespace fusevfs {
 

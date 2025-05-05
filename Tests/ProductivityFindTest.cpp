@@ -1,4 +1,4 @@
-#include <Views/TFileSystemCLI.hpp>
+#include <Views/FSCLI.hpp>
 #include <Controllers/NSFindFile.hpp>
 #include <gtest/gtest.h>
 
@@ -9,7 +9,7 @@
 #include <chrono>
 
 #include <unistd.h>
-#include <Views/TFileSystemClientCLI.hpp>
+#include <Views/FSClientCLI.hpp>
 
 using namespace std::chrono_literals;
 

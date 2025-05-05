@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Views/TFileSystemClientCLI.hpp>
+#include <Views/FSClientCLI.hpp>
 
 #include <filesystem>
 #include <cstdlib>

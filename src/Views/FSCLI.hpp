@@ -3,9 +3,9 @@
 
 namespace fusevfs {
 
-    class TFileSystemCLI final : public CLI::App {
+    class FSCLI final : public CLI::App {
     public:
-        TFileSystemCLI();
+        FSCLI();
 
     private:
         std::filesystem::path m_mountPoint;

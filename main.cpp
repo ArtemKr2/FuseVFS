@@ -1,7 +1,7 @@
-#include <Views/TFileSystemCLI.hpp>
+#include <Views/FSCLI.hpp>
 
 int main(int argc, char *argv[]) {
-    auto cli = fusevfs::TFileSystemCLI();
+    auto cli = fusevfs::FSCLI();
     CLI11_PARSE(cli, argc, argv);
     return 0;
 }

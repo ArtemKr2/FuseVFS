@@ -1,4 +1,4 @@
-#include <Views/TFileSystemClientCLI.hpp>
+#include <Views/FSClientCLI.hpp>
 
 int main(int argc, char *argv[]) {
     auto cli = fusevfs::TFileSystemClientCLI();

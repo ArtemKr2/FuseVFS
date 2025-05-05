@@ -1,11 +1,10 @@
-#include <Views/TFileSystemCLI.hpp>
+#include <Views/FSCLI.hpp>
 #include <Controllers/TFileSystem.hpp>
 
 namespace fusevfs {
 
-
-    TFileSystemCLI::TFileSystemCLI()
-        : CLI::App{"FuseVFS"}
+    FSCLI::FSCLI()
+        : App{"FuseVFS"}
     {
         // Создаём опции и сохраняем указатели
         auto* fg         = add_flag("-f,--foreground",   "Keep process in foreground");
