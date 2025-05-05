@@ -1,4 +1,0 @@
-/snap/clion/332/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/332/bin/ninja/linux/x64/ninja -DCMAKE_C_COMPILER=/usr/bin/gcc-13 -DCMAKE_CXX_COMPILER=/usr/bin/g++-13 -G Ninja -S /home/artem4ik/Projects/FuseVFS -B /home/artem4ik/Projects/FuseVFS/cmake-build-debug
--- Configuring done (3.5s)
--- Generating done (0.2s)
--- Build files have been written to: /home/artem4ik/Projects/FuseVFS/cmake-build-debug

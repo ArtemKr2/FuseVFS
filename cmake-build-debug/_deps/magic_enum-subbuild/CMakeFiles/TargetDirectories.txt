@@ -1,3 +1,0 @@
-/home/artem4ik/Projects/FuseVFS/cmake-build-debug/_deps/magic_enum-subbuild/CMakeFiles/magic_enum-populate.dir
-/home/artem4ik/Projects/FuseVFS/cmake-build-debug/_deps/magic_enum-subbuild/CMakeFiles/edit_cache.dir
-/home/artem4ik/Projects/FuseVFS/cmake-build-debug/_deps/magic_enum-subbuild/CMakeFiles/rebuild_cache.dir
