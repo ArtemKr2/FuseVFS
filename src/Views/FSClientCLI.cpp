@@ -4,7 +4,7 @@ namespace fusevfs {
 
     static constexpr unsigned long bufferSize = 1000;
 
-    TFileSystemClientCLI::TFileSystemClientCLI() : CLI::App("FindByName") {
+    FSClientCLI::FSClientCLI() : CLI::App("FindByName") {
         add_option("--pipe-point,-p", m_xPipePath, "Pipe point")
             ->required(true);
         add_option("--file-name,-f", m_sFileName, "File name")

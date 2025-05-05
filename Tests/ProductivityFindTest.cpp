@@ -100,7 +100,7 @@ protected:
 
 TEST_F(TFileSystemTimeTestFixture, FindFileTimeVFS) {
     auto t0 = std::chrono::steady_clock::now();
-    const std::string res = fusevfs::TFileSystemClientCLI::FindByNameWithSocket(SocketPath, "F");
+    const std::string res = fusevfs::FSClientCLI::FindByNameWithSocket(SocketPath, "F");
     auto t1 = std::chrono::steady_clock::now();
     auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
     std::vector<std::string> paths;

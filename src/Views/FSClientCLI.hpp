@@ -7,13 +7,13 @@
 
 namespace fusevfs {
 
-    class TFileSystemClientCLI final : public CLI::App {
+    class FSClientCLI final : public CLI::App {
         std::filesystem::path m_xPipePath;
         std::string m_sFileName;
         static constexpr std::string_view s_sError = "Can not open the pipe for writing";
 
     public:
-        TFileSystemClientCLI();
+        FSClientCLI();
 
         static std::string FindByNameWithSocket(const std::filesystem::path& socketPath,
                                  const std::string& name) {

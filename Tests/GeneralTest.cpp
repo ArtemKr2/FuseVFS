@@ -125,7 +125,7 @@ TEST_F(TFileSystemTestFixture, FindByName) {
     std::filesystem::create_directory(std::filesystem::path(MountPoint) / "bar/bar/baz/bar");
     const auto filePath = std::filesystem::path(MountPoint) / "bar/testfile.txt";
     std::ofstream(filePath.c_str()) << "information";
-    const std::string result = fusevfs::TFileSystemClientCLI::FindByNameWithSocket(SocketPath, "testfile.txt");
+    const std::string result = fusevfs::FSClientCLI::FindByNameWithSocket(SocketPath, "testfile.txt");
     std::cout << result << std::endl;
     // EXPECT_STREQ(buffer.data(), "/bar\n/bar/bar\n/bar/bar/baz/bar\n");
     EXPECT_STREQ(result.c_str(), "/bar/testfile.txt\n");
