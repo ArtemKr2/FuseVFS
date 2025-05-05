@@ -42,36 +42,6 @@ namespace fusevfs {
             return all;
         }
 
-     //    template<unsigned long BufferSize>
-     // static void FindByName(const std::filesystem::path& pipePath, const std::string& fileName, std::array<char, BufferSize>& buffer) {
-     //        {
-     //            std::cerr << "[FindByName] before fOut = std::ofstream(pipePath);" << std::endl;
-     //            auto fOut = std::ofstream(pipePath);
-     //            std::cerr << "[FindByName] after fOut = std::ofstream(pipePath);" << std::endl;
-     //            std::cerr << "[FindByName] before !fOut.is_open();" << std::endl;
-     //            if(!fOut.is_open()) {
-     //                throw std::invalid_argument(s_sError.data());
-     //            }
-     //            std::cerr << "[FindByName] after !fOut.is_open();" << std::endl;
-     //            std::cerr << "[FindByName] before fOut << fileName;" << std::endl;
-     //            fOut << fileName;
-     //            std::cerr << "[FindByName] after fOut << fileName;" << std::endl;
-     //        }
-     //        {
-     //            std::cerr << "[FindByName] before fIn = std::ifstream(pipePath);" << std::endl;
-     //            auto fIn = std::ifstream(pipePath);
-     //            std::cerr << "[FindByName] after fIn = std::ifstream(pipePath);" << std::endl;
-     //            std::cerr << "[FindByName] before !fIn.is_open();" << std::endl;
-     //            if(!fIn.is_open()) {
-     //                throw std::invalid_argument(s_sError.data());
-     //            }
-     //            std::cerr << "[FindByName] after !fIn.is_open();" << std::endl;
-     //            std::cerr << "[FindByName] before !fIn.read();" << std::endl;
-     //            fIn.read(buffer.data(), buffer.size());
-     //            std::cerr << "[FindByName] after !fIn.read();" << std::endl;
-     //        }
-     //    }
-
     };
 
 }

@@ -1,22 +1,22 @@
 #pragma once
 
-#include <Models/TFileObjects.hpp>
-#include <Models/NNFileAccess.hpp>
+#include <Models/FileObjects.hpp>
+#include <Models/FileAccess.hpp>
 
 #include <filesystem>
 
 namespace fusevfs::NSAccessFile {
 
-    NFileAccess Access(const std::filesystem::path& path, const int accessMask);
-    NFileAccess Access(const ASharedFileVariant& var, const int accessMask);
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var, const int accessMask);
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var, const int accessMask);
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var, const int accessMask);
-    NFileAccess AccessWithFuseFlags(const std::filesystem::path& path, const int fuseFlags);
-    NFileAccess AccessWithFuseFlags(const ASharedFileVariant& var, const int fuseFlags);
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var, const int fuseFlags);
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var, const int fuseFlags);
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var, const int fuseFlags);
+    FileAccessType Access(const std::filesystem::path& path, const int accessMask);
+    FileAccessType Access(const FileObjectSharedVariant& var, const int accessMask);
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<Link>>& var, const int accessMask);
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var, const int accessMask);
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var, const int accessMask);
+    FileAccessType AccessWithFuseFlags(const std::filesystem::path& path, const int fuseFlags);
+    FileAccessType AccessWithFuseFlags(const FileObjectSharedVariant& var, const int fuseFlags);
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var, const int fuseFlags);
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<Link>>& var, const int fuseFlags);
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var, const int fuseFlags);
 
 }
 

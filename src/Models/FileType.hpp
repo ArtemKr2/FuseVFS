@@ -3,15 +3,15 @@
 
 namespace fusevfs {
 
-namespace NNFileType {
-    enum NFileType {
+namespace FileType {
+    enum FileTypeEnum {
         Directory = S_IFDIR,
         File = S_IFREG,
         Link = S_IFLNK
     };
 }
 
-using NFileType = NNFileType::NFileType;
+using FileTypeEnum = FileType::FileTypeEnum;
 
 }
 

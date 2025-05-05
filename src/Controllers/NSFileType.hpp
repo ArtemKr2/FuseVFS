@@ -1,16 +1,16 @@
 #pragma once
-#include <Models/NNFileType.hpp>
-#include <Models/TFileObjects.hpp>
+#include <Models/FileType.hpp>
+#include <Models/FileObjects.hpp>
 
 namespace fusevfs::NSFileType {
 
-constexpr NFileType Get(const ASharedFileVariant& var) {
+constexpr FileTypeEnum Get(const FileObjectSharedVariant& var) {
     return std::visit([](const auto& file) { return Get(file); }, var);
 }
-constexpr NFileType Get(const CSharedRwFileObject auto& var) {
+constexpr FileTypeEnum Get(const FileObjectSharedRWConcept auto& var) {
     return std::remove_reference_t<decltype(var)>::element_type::InnerType::FileType;
 }
-constexpr NFileType Get(const CGuardFileObject auto& var) {
+constexpr FileTypeEnum Get(const FileObjectGuardConcept auto& var) {
     return std::remove_reference_t<decltype(var)>::InnerType::FileType;
 }
 

@@ -3,8 +3,8 @@
 
 namespace fusevfs {
 
-    template<typename ParentType>
-    class TFile {
+    template<typename Parent>
+    class File {
 
     protected:
         std::chrono::system_clock::time_point m_modified;  // modification time
@@ -15,9 +15,9 @@ namespace fusevfs {
         mode_t m_uMode = 0;
         uid_t m_uUid = 0;
         gid_t m_uGid = 0;
-        std::weak_ptr<read_write_lock::RWLock<ParentType>> m_pParent;
+        std::weak_ptr<read_write_lock::RWLock<Parent>> m_pParent;
     public:
-        TFile()=default;
+        File()=default;
 
 
         friend class TGetInfoChanged;

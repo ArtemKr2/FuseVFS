@@ -2,7 +2,7 @@
 #define FUSE_USE_VERSION 30
 #include <fuse3/fuse.h>
 
-#include <Models/TFileObjects.hpp>
+#include <Models/FileObjects.hpp>
 
 #include <filesystem>
 
@@ -12,7 +12,7 @@ namespace fusevfs {
 
 class TFileSystem {
 public:
-    static const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& RootDir();
+    static const std::shared_ptr<read_write_lock::RWLock<Directory>>& RootDir();
 
     static std::filesystem::path SocketPath;
 

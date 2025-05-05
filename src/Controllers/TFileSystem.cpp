@@ -107,7 +107,7 @@ namespace fusevfs {
                              struct fuse_file_info*)
     {
         try {
-            auto var = NSFindFile::Find(path);  // ASharedFileVariant
+            auto var = NSFindFile::Find(path);  // FileObjectSharedVariant
 
             using clock = std::chrono::system_clock;
             auto now = clock::now();
@@ -173,12 +173,12 @@ namespace fusevfs {
         }
     }
 
-    template<CFileObject T, typename ...Args>
+    template<FileObjectConcept T, typename ...Args>
     int AddFile(const char* path, mode_t mode, Args&&... args) {
         const auto newPath = std::filesystem::path(path);
         const auto parentPath = newPath.parent_path();
         auto parentDir = NSFindFile::FindDir(parentPath);
-        if(NSAccessFile::Access(parentDir, W_OK)==NFileAccess::Restricted) {
+        if(NSAccessFile::Access(parentDir, W_OK)==FileAccessType::Restricted) {
             return ExceptionTypeEnum::AccessNotPermitted;
         }
         T::New(newPath.filename(), mode, parentDir, args...);
@@ -195,7 +195,7 @@ namespace fusevfs {
 
     int TFileSystem::MkNod(const char* path, mode_t mode, dev_t rdev) {
         try {
-            return AddFile<TRegularFile>(path, mode);
+            return AddFile<RegularFile>(path, mode);
         } catch(const FSException& ex) {
             return ex.Type();
         }
@@ -203,7 +203,7 @@ namespace fusevfs {
 
     int TFileSystem::MkDir(const char* path, mode_t mode) {
         try {
-            return AddFile<TDirectory>(path, mode);
+            return AddFile<Directory>(path, mode);
         } catch(const FSException& ex) {
             return ex.Type();
         }
@@ -243,7 +243,7 @@ namespace fusevfs {
 
     int TFileSystem::SymLink(const char* target_path, const char* link_path) {
         try {
-            return AddFile<TLink>(link_path, 0777, target_path);
+            return AddFile<Link>(link_path, 0777, target_path);
 
         } catch(const FSException& ex) {
             return ex.Type();
@@ -288,7 +288,7 @@ namespace fusevfs {
     int TFileSystem::Read(const char* path, char* buffer, size_t size, off_t offset, struct fuse_file_info* info) {
         try {
             auto file = NSFindFile::FindRegularFile(path);
-            if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==NFileAccess::Restricted) {
+            if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==FileAccessType::Restricted) {
                 return ExceptionTypeEnum::AccessNotPermitted;
             }
             {
@@ -328,7 +328,7 @@ namespace fusevfs {
     int TFileSystem::Write(const char* path, const char* buffer, size_t size, off_t offset, struct fuse_file_info* info) {
         try {
             auto file = NSFindFile::FindRegularFile(path);
-            if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==NFileAccess::Restricted) {
+            if(NSAccessFile::AccessWithFuseFlags(file, info->flags)==FileAccessType::Restricted) {
                 return ExceptionTypeEnum::AccessNotPermitted;
             }
             auto wr = file->Write();
@@ -383,8 +383,8 @@ namespace fusevfs {
         }
     }
 
-    const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& TFileSystem::RootDir() {
-        static auto s_pRootDir = TDirectory::New(s_sRootPath.data(), static_cast<mode_t>(0777), nullptr);
+    const std::shared_ptr<read_write_lock::RWLock<Directory>>& TFileSystem::RootDir() {
+        static auto s_pRootDir = Directory::New(s_sRootPath.data(), static_cast<mode_t>(0777), nullptr);
         return s_pRootDir;
     }
 

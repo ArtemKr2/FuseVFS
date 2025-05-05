@@ -13,15 +13,15 @@ namespace fusevfs {
         return std::visit([this](const auto& obj) { return DoReadDir(obj); }, res);
     }
 
-    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var) {
+    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var) {
         FillerDirectory(var);
     }
 
-    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var) {
+    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var) {
         throw FSException(m_pPath, ExceptionTypeEnum::NotDirectory);
     }
 
-    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var) {
+    void TReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var) {
         const auto varRead = var->Read();
         const auto dir = NSFindFile::FindDir(varRead->LinkTo);
         FillerDirectory(dir);
@@ -31,7 +31,7 @@ namespace fusevfs {
         m_xFiller(m_pBuffer, name.data(), NULL, 0, fuse_fill_dir_flags::FUSE_FILL_DIR_PLUS);
     }
 
-    void TReadDirectory::FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& dir) {
+    void TReadDirectory::FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir) {
         const auto dirRead = dir->Read();
         for(const auto& var : dirRead->Files) {
             const auto name = TGetInfoName{}(var);

@@ -16,19 +16,19 @@ namespace fusevfs::NSFileAttributes {
         out.tv_nsec = static_cast<long>(ns);
     }
 
-    void UpdateSize(const read_write_lock::RWLockReadGuard<TDirectory>&, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<Directory>&, struct stat* st) {
         st->st_size = 4096;
     }
 
-    void UpdateSize(const read_write_lock::RWLockReadGuard<TRegularFile>& varRead, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<RegularFile>& varRead, struct stat* st) {
         st->st_size = static_cast<off_t>(varRead->Data.size());
     }
 
-    void UpdateSize(const read_write_lock::RWLockReadGuard<TLink>& varRead, struct stat* st) {
+    void UpdateSize(const read_write_lock::RWLockReadGuard<Link>& varRead, struct stat* st) {
         st->st_size = static_cast<off_t>(std::string_view(varRead->LinkTo.c_str()).size());
     }
 
-// void GetGeneral(const CSharedRwFileObject auto& var, struct stat* st) {
+// void GetGeneral(const FileObjectSharedRWConcept auto& var, struct stat* st) {
 //     const auto varRead = var->Read();
 //     st->st_mode = TGetInfoMode{}(varRead);
 //     st->st_gid = TGetInfoGid{}(varRead);
@@ -37,7 +37,7 @@ namespace fusevfs::NSFileAttributes {
 //     UpdateSize(varRead, st);
 // }
 //
-    void GetTotal(const CSharedRwFileObject auto& var, struct stat* st)
+    void GetTotal(const FileObjectSharedRWConcept auto& var, struct stat* st)
     {
         auto rd = var->Read();                     // shared-lock
 
@@ -60,11 +60,11 @@ namespace fusevfs::NSFileAttributes {
         using Inner = typename std::remove_reference_t<
                           decltype(var)>::element_type::InnerType;
 
-        if constexpr(std::same_as<Inner, TDirectory>)
+        if constexpr(std::same_as<Inner, Directory>)
         {
             std::size_t subDirs = std::count_if(
                 rd->Files.begin(), rd->Files.end(),
-                [](auto& v){ return std::holds_alternative<std::shared_ptr<read_write_lock::RWLock<TDirectory>>>(v); });
+                [](auto& v){ return std::holds_alternative<std::shared_ptr<read_write_lock::RWLock<Directory>>>(v); });
             st->st_nlink = 2 + subDirs;
         }
         else
@@ -76,7 +76,7 @@ namespace fusevfs::NSFileAttributes {
         FillTimespec(TGetInfoAccessed{}(var), st->st_atim); // atime  (ls -lu)
     }
 
-void Get(const ASharedFileVariant& var, struct stat* st) {
+void Get(const FileObjectSharedVariant& var, struct stat* st) {
     std::visit([st](const auto& file) { GetTotal(file, st); }, var);
 }
 

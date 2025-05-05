@@ -1,7 +1,7 @@
 #pragma once
 #define FUSE_USE_VERSION 30
 
-#include <Models/TFileObjects.hpp>
+#include <Models/FileObjects.hpp>
 #include <fuse3/fuse.h>
 #include <string_view>
 
@@ -17,13 +17,13 @@ public:
     void operator()();
 
 protected:
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var);
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var);
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var);
+    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var);
+    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var);
+    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var);
 
 
     void FillerBuffer(const std::string_view& name);
-    void FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& dir);
+    void FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir);
 };
 
 }

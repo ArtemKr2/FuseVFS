@@ -7,12 +7,12 @@
 
 namespace fusevfs::NSDeleteFile {
 
-void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& dir, const std::filesystem::path& dirPath);
+void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir, const std::filesystem::path& dirPath);
 
-static void DeleteWithIterator( std::vector<ASharedFileVariant>& parentFiles,
-                                std::vector<ASharedFileVariant>::iterator it, const std::filesystem::path& itPath) {
+static void DeleteWithIterator( std::vector<FileObjectSharedVariant>& parentFiles,
+                                std::vector<FileObjectSharedVariant>::iterator it, const std::filesystem::path& itPath) {
 
-    if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<TDirectory>>>(&*it)) {
+    if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<Directory>>>(&*it)) {
         DeleteChildrenInDirectory(*childDirPtr, itPath);
     }
 
@@ -20,7 +20,7 @@ static void DeleteWithIterator( std::vector<ASharedFileVariant>& parentFiles,
     parentFiles.erase(it);
 }
 
-void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& dir, const std::filesystem::path& dirPath) {
+void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir, const std::filesystem::path& dirPath) {
     auto dirWrite = dir->Write();
     auto& files = dirWrite->Files;
     for(auto i = unsigned(0); i < files.size(); ++i) {

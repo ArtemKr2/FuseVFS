@@ -4,7 +4,6 @@
 #include <Controllers/TGetFileParameter.hpp>
 #include <Controllers/NSAccessFile.hpp>
 
-#include <array>
 #include <iostream>
 #include <map>
 
@@ -13,9 +12,9 @@ namespace fusevfs::NSFindFile {
 static constexpr std::string_view s_sRootPath = "/";
 static auto s_mNamePath = read_write_lock::RWLock<std::map<std::string, std::set<std::filesystem::path>>>();
 
-ASharedFileVariant RecursiveFind(const std::filesystem::path& path,
+FileObjectSharedVariant RecursiveFind(const std::filesystem::path& path,
     std::filesystem::path::iterator it,
-    const read_write_lock::RWLockReadGuard<TDirectory>& dirRead) {
+    const read_write_lock::RWLockReadGuard<Directory>& dirRead) {
 
     const auto& itName = it->native();
     const auto& files = dirRead->Files;
@@ -31,9 +30,9 @@ ASharedFileVariant RecursiveFind(const std::filesystem::path& path,
     if(std::distance(it, path.end()) == 1) {
         return *childIt;
     }
-    if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<TDirectory>>>(&*childIt)) {
+    if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<Directory>>>(&*childIt)) {
         const auto& childDir = *childDirPtr;
-        if(NSAccessFile::Access(childDir, X_OK)==NNFileAccess::Restricted) {
+        if(NSAccessFile::Access(childDir, X_OK)==FileAccessType::Restricted) {
             throw FSException(path.begin(), it, ExceptionTypeEnum::AccessNotPermitted);
         }
         return RecursiveFind(path, ++it, childDir->Read());
@@ -76,7 +75,7 @@ std::shared_ptr<read_write_lock::RWLock<T>> FindGeneral(const std::filesystem::p
     throw FSException(path.begin(), path.end(), FSExceptionValue);
 }
 
-ASharedFileVariant Find(const std::filesystem::path& path) {
+FileObjectSharedVariant Find(const std::filesystem::path& path) {
     const auto& rootDir = TFileSystem::RootDir();
     const auto normalizedPath = path.lexically_normal();
     if(normalizedPath == s_sRootPath) {
@@ -85,16 +84,16 @@ ASharedFileVariant Find(const std::filesystem::path& path) {
     return RecursiveFind(normalizedPath, ++normalizedPath.begin(), rootDir->Read());
 }
 
-std::shared_ptr<read_write_lock::RWLock<TDirectory>> FindDir(const std::filesystem::path& path) {
-    return FindGeneral<TDirectory, ExceptionTypeEnum::NotDirectory>(path);
+std::shared_ptr<read_write_lock::RWLock<Directory>> FindDir(const std::filesystem::path& path) {
+    return FindGeneral<Directory, ExceptionTypeEnum::NotDirectory>(path);
 }
 
-std::shared_ptr<read_write_lock::RWLock<TLink>> FindLink(const std::filesystem::path& path) {
-    return FindGeneral<TLink, ExceptionTypeEnum::NotLink>(path);
+std::shared_ptr<read_write_lock::RWLock<Link>> FindLink(const std::filesystem::path& path) {
+    return FindGeneral<Link, ExceptionTypeEnum::NotLink>(path);
 }
 
-std::shared_ptr<read_write_lock::RWLock<TRegularFile>> FindRegularFile(const std::filesystem::path& path) {
-    return FindGeneral<TRegularFile, ExceptionTypeEnum::NotFile>(path);
+std::shared_ptr<read_write_lock::RWLock<RegularFile>> FindRegularFile(const std::filesystem::path& path) {
+    return FindGeneral<RegularFile, ExceptionTypeEnum::NotFile>(path);
 }
 
 }

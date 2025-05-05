@@ -2,8 +2,6 @@
 
 namespace fusevfs {
 
-    static constexpr unsigned long bufferSize = 1000;
-
     FSClientCLI::FSClientCLI() : CLI::App("FindByName") {
         add_option("--pipe-point,-p", m_xPipePath, "Pipe point")
             ->required(true);

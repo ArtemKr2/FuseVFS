@@ -10,23 +10,23 @@
 
 namespace fusevfs::NSAccessFile {
 
-    NFileAccess DoAccess(const std::array<int, 3>& sFlags, const mode_t mode, const int accessMask) {
+    FileAccessType DoAccess(const std::array<int, 3>& sFlags, const mode_t mode, const int accessMask) {
         auto specializedMode = 0;
         static std::array accessFlags = {R_OK, W_OK, X_OK};
         for(auto i = 0u; i < accessFlags.size(); ++i) {
             if(mode & sFlags[i]) specializedMode |= accessFlags[i];
         }
         auto res = specializedMode & accessMask;
-        return res ? NFileAccess::Ok : NFileAccess::Restricted;
+        return res ? FileAccessType::Ok : FileAccessType::Restricted;
     }
 
-    NFileAccess AccessSpecialized(const CSharedRwFileObject auto& var, const int accessMask) {
+    FileAccessType AccessSpecialized(const FileObjectSharedRWConcept auto& var, const int accessMask) {
         const auto mode = TGetInfoMode{}(var);
         const auto context = fuse_get_context();
         const auto uid = TGetInfoUid{}(var);
 
         if(uid == 0) {
-            return NFileAccess::Ok;
+            return FileAccessType::Ok;
         }
 
         if(uid == context->uid) {
@@ -38,39 +38,39 @@ namespace fusevfs::NSAccessFile {
         return DoAccess({S_IROTH, S_IWOTH, S_IXOTH}, mode, accessMask);
     }
 
-    NFileAccess Access(const std::filesystem::path& path, const int accessMask) {
+    FileAccessType Access(const std::filesystem::path& path, const int accessMask) {
         return Access(NSFindFile::Find(path), accessMask);
     }
 
-    NFileAccess Access(const ASharedFileVariant& var, const int accessMask) {
+    FileAccessType Access(const FileObjectSharedVariant& var, const int accessMask) {
         return std::visit([accessMask](const auto& file) {
             return NSAccessFile::Access(file, accessMask);
         }, var);
     }
 
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var, const int accessMask) {
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<Link>>& var, const int accessMask) {
         return Access(NSFindFile::Find(var->Read()->LinkTo), accessMask);
     }
 
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var, const int accessMask) {
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var, const int accessMask) {
         return AccessSpecialized(var, accessMask);
     }
 
-    NFileAccess Access(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var, const int accessMask) {
+    FileAccessType Access(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var, const int accessMask) {
         return AccessSpecialized(var, accessMask);
     }
 
-    NFileAccess AccessWithFuseFlags(const std::filesystem::path& path, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlags(const std::filesystem::path& path, const int fuseFlags) {
         return AccessWithFuseFlags(NSFindFile::Find(path), fuseFlags);
     }
 
-    NFileAccess AccessWithFuseFlags(const ASharedFileVariant& var, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlags(const FileObjectSharedVariant& var, const int fuseFlags) {
         return std::visit([fuseFlags](const auto& file) {
             return NSAccessFile::AccessWithFuseFlags(file, fuseFlags);
         }, var);
     }
 
-    NFileAccess AccessWithFuseFlagsSpecialized(const CSharedRwFileObject auto& var, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlagsSpecialized(const FileObjectSharedRWConcept auto& var, const int fuseFlags) {
         const auto s_mAccessFlags = std::map<int, int> {
             {O_RDONLY, R_OK},
             {O_WRONLY, W_OK},
@@ -87,15 +87,15 @@ namespace fusevfs::NSAccessFile {
         return NSAccessFile::Access(var, mask);
     }
 
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TRegularFile>>& var, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var, const int fuseFlags) {
         return AccessWithFuseFlagsSpecialized(var, fuseFlags);
     }
 
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TLink>>& var, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<Link>>& var, const int fuseFlags) {
         return AccessWithFuseFlagsSpecialized(var, fuseFlags);
     }
 
-    NFileAccess AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& var, const int fuseFlags) {
+    FileAccessType AccessWithFuseFlags(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var, const int fuseFlags) {
         return AccessWithFuseFlagsSpecialized(var, fuseFlags);
     }
 

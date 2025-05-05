@@ -1,5 +1,5 @@
 #pragma once
-#include <Models/TFileObjects.hpp>
+#include <Models/FileObjects.hpp>
 #include <Controllers/NSFileType.hpp>
 #include <iostream>
 
@@ -11,12 +11,12 @@ namespace fusevfs {
         const ParamType m_xParam;
     public:
         explicit TSetInfoParameterMixin(const ParamType& param) : m_xParam{param} {}
-        void operator()(const ASharedFileVariant& var) { std::visit(*Self(), var); }
+        void operator()(const FileObjectSharedVariant& var) { std::visit(*Self(), var); }
 
         protected:
         constexpr DerivedType* Self() { return reinterpret_cast<DerivedType*>(this); }
-        TFile<TDirectory>* FileBase(CWriteGuardFileObject auto& var) {
-            return reinterpret_cast<TFile<TDirectory>*>(var.GetPtr());
+        File<Directory>* FileBase(FileObjectWriteGuardConcept auto& var) {
+            return reinterpret_cast<File<Directory>*>(var.GetPtr());
         }
 
     };
@@ -28,7 +28,7 @@ namespace fusevfs {
             : TSetInfoParameterMixin<ParamType, DerivedType>(param) {}
 
         using TSetInfoParameterMixin<ParamType, DerivedType>::operator();
-        void operator()(const CSharedRwFileObject auto& var) {
+        void operator()(const FileObjectSharedRWConcept auto& var) {
             auto varWrite = var->Write();
             this->Self()->operator()(varWrite);
         }
@@ -53,7 +53,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_accessed = this->m_xParam;
         }
     };
@@ -75,7 +75,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_modified = this->m_xParam;
         }
     };
@@ -97,7 +97,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_changed = this->m_xParam;
         }
     };
@@ -115,7 +115,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_sName = m_xParam;
         }
     };
@@ -132,7 +132,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_uUid = m_xParam;
         }
     };
@@ -149,7 +149,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g) {
+        void operator()(FileObjectWriteGuardConcept auto& g) {
             this->FileBase(g)->m_uGid = m_xParam;
         }
     };
@@ -166,7 +166,7 @@ namespace fusevfs {
 
         using Base::operator();
 
-        void operator()(CWriteGuardFileObject auto& g, bool is_first=false) {
+        void operator()(FileObjectWriteGuardConcept auto& g, bool is_first=false) {
             auto* fileBase = this->FileBase(g);
             constexpr mode_t PERM_MASK = S_IRWXU|S_IRWXG|S_IRWXO;  // 0777
             constexpr mode_t TYPE_MASK = S_IFMT;                  // 0170000
@@ -187,19 +187,19 @@ namespace fusevfs {
     // ────────────────────────────────────────────────────────────────
     class TSetInfoParent
         : public TSetInfoParameterMixin<
-              std::shared_ptr<read_write_lock::RWLock<TDirectory>>,
+              std::shared_ptr<read_write_lock::RWLock<Directory>>,
               TSetInfoParent>
     {
         using Base = TSetInfoParameterMixin<
-                         std::shared_ptr<read_write_lock::RWLock<TDirectory>>,
+                         std::shared_ptr<read_write_lock::RWLock<Directory>>,
                          TSetInfoParent>;
     public:
-        explicit TSetInfoParent(const std::shared_ptr<read_write_lock::RWLock<TDirectory>>& p)
+        explicit TSetInfoParent(const std::shared_ptr<read_write_lock::RWLock<Directory>>& p)
             : Base(p) {}
 
         using Base::operator();
 
-        void operator()(const CSharedRwFileObject auto& lock)
+        void operator()(const FileObjectSharedRWConcept auto& lock)
         {
             {
                 auto wr = lock->Write();
@@ -212,7 +212,7 @@ namespace fusevfs {
         }
 
     protected:
-        void operator()(CWriteGuardFileObject auto& g)
+        void operator()(FileObjectWriteGuardConcept auto& g)
         {
             this->FileBase(g)->m_pParent = m_xParam;
         }
