@@ -1,0 +1,1 @@
+/usr/bin/g++-13 -Wall -O3 -DNDEBUG CMakeFiles/ProductivityFindTest.dir/ProductivityFindTest.cpp.o -o ProductivityFindTest  ../libFuseVFS.a ../lib/libgtest_main.a -lfuse3 -lpthread ../lib/libgtest.a -lpthread

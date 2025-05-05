@@ -1,0 +1,1 @@
+/usr/bin/g++-13 -Wall -O3 -DNDEBUG CMakeFiles/FuseVFSFind.dir/FuseVFSFind.cpp.o -o FuseVFSFind  libFuseVFS.a -lpthread -lfuse3 -lpthread

@@ -1,0 +1,7 @@
+FileSystemTests 0 0
+TFileSystemTestFixture.FileAccess 0 0
+TFileSystemTimeTestFixture.FindFileTimeVFS 0 0
+TFileSystemTimeTestFixture.FindFileTimeGeneralFS 1 18.4348
+FileSystemSuite 1 1.67814
+---
+TFileSystemTimeTestFixture.FindFileTimeVFS

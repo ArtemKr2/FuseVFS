@@ -1,0 +1,5 @@
+add_test([=[TFileSystemTimeTestFixture.FindFileTimeVFS]=]  /home/artem4ik/Projects/FuseVFS/build/Tests/ProductivityFindTest [==[--gtest_filter=TFileSystemTimeTestFixture.FindFileTimeVFS]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[TFileSystemTimeTestFixture.FindFileTimeVFS]=]  PROPERTIES WORKING_DIRECTORY /home/artem4ik/Projects/FuseVFS/build/Tests SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test([=[TFileSystemTimeTestFixture.FindFileTimeGeneralFS]=]  /home/artem4ik/Projects/FuseVFS/build/Tests/ProductivityFindTest [==[--gtest_filter=TFileSystemTimeTestFixture.FindFileTimeGeneralFS]==] --gtest_also_run_disabled_tests)
+set_tests_properties([=[TFileSystemTimeTestFixture.FindFileTimeGeneralFS]=]  PROPERTIES WORKING_DIRECTORY /home/artem4ik/Projects/FuseVFS/build/Tests SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set(  ProductivityFindTest_TESTS TFileSystemTimeTestFixture.FindFileTimeVFS TFileSystemTimeTestFixture.FindFileTimeGeneralFS)

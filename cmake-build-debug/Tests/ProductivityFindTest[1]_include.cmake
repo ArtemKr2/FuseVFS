@@ -1,0 +1,5 @@
+if(EXISTS "/home/artem4ik/Projects/FuseVFS/cmake-build-debug/Tests/ProductivityFindTest[1]_tests.cmake")
+  include("/home/artem4ik/Projects/FuseVFS/cmake-build-debug/Tests/ProductivityFindTest[1]_tests.cmake")
+else()
+  add_test(ProductivityFindTest_NOT_BUILT ProductivityFindTest_NOT_BUILT)
+endif()

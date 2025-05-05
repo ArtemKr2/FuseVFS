@@ -1,0 +1,5 @@
+if(EXISTS "/home/artem4ik/Projects/FuseVFS/build/Tests/GeneralTest[1]_tests.cmake")
+  include("/home/artem4ik/Projects/FuseVFS/build/Tests/GeneralTest[1]_tests.cmake")
+else()
+  add_test(GeneralTest_NOT_BUILT GeneralTest_NOT_BUILT)
+endif()
