@@ -4,9 +4,9 @@
 namespace fusevfs {
 
 template<typename FieldType, typename Derived>
-class TGetFileParameter {
+class GetFileParameter {
     public:
-    TGetFileParameter()=default;
+    GetFileParameter()=default;
 
     const FieldType& operator()(const FileObjectSharedVariant& var) {
         return std::visit(*this, var);
@@ -16,73 +16,72 @@ class TGetFileParameter {
     }
 };
 
-
-class TGetInfoName : public TGetFileParameter<std::string, TGetInfoName> {
+class GetNameParameter : public GetFileParameter<std::string, GetNameParameter> {
     public:
-    using TGetFileParameter<std::string, TGetInfoName>::operator();
-    TGetInfoName()=default;
+    using GetFileParameter<std::string, GetNameParameter>::operator();
+    GetNameParameter()=default;
     const std::string& operator()(const FileObjectGuardConcept auto& var) {
-        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->m_sName;
+        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->FileName;
     }
     std::string& operator()(FileObjectWriteGuardConcept auto& var) {
-        return reinterpret_cast<File<Directory>*>(var.GetPtr())->m_sName;
+        return reinterpret_cast<File<Directory>*>(var.GetPtr())->FileName;
     }
 };
 
-class TGetInfoUid : public TGetFileParameter<uid_t, TGetInfoUid> {
+class GetUIDParameter : public GetFileParameter<uid_t, GetUIDParameter> {
     public:
-    using TGetFileParameter<uid_t, TGetInfoUid>::operator();
-    TGetInfoUid()=default;
+    using GetFileParameter<uid_t, GetUIDParameter>::operator();
+    GetUIDParameter()=default;
     const uid_t& operator()(const FileObjectGuardConcept auto& var) {
-        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->m_uUid;
+        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->FileUID;
     }
     uid_t& operator()(FileObjectWriteGuardConcept auto& var) {
-        return reinterpret_cast<File<Directory>*>(var.GetPtr())->m_uUid;
+        return reinterpret_cast<File<Directory>*>(var.GetPtr())->FileUID;
     }
 };
 
-class TGetInfoGid : public TGetFileParameter<gid_t, TGetInfoGid> {
+class GetGIDParameter : public GetFileParameter<gid_t, GetGIDParameter> {
     public:
-    using TGetFileParameter<gid_t, TGetInfoGid>::operator();
-    TGetInfoGid()=default;
+    using GetFileParameter<gid_t, GetGIDParameter>::operator();
+    GetGIDParameter()=default;
     const gid_t& operator()(const FileObjectGuardConcept auto& var) {
-        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->m_uGid;
+        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->FileGID;
     }
     gid_t& operator()(FileObjectWriteGuardConcept auto& var) {
-        return reinterpret_cast<File<Directory>*>(var.GetPtr())->m_uGid;
+        return reinterpret_cast<File<Directory>*>(var.GetPtr())->FileGID;
     }
 };
 
-class TGetInfoMode : public TGetFileParameter<mode_t, TGetInfoMode> {
+class GetModeParameter : public GetFileParameter<mode_t, GetModeParameter> {
     public:
-    using TGetFileParameter<mode_t, TGetInfoMode>::operator();
-    TGetInfoMode()=default;
+    using GetFileParameter<mode_t, GetModeParameter>::operator();
+    GetModeParameter()=default;
     const mode_t& operator()(const FileObjectGuardConcept auto& var) {
-        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->m_uMode;
+        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->FileMode;
     }
     mode_t& operator()(FileObjectWriteGuardConcept auto& var) {
-        return reinterpret_cast<File<Directory>*>(var.GetPtr())->m_uMode;
+        return reinterpret_cast<File<Directory>*>(var.GetPtr())->FileMode;
     }
 };
 
-class TGetInfoParent : public TGetFileParameter<std::weak_ptr<read_write_lock::RWLock<Directory>>, TGetInfoParent> {
+class GetParentParameter : public GetFileParameter<std::weak_ptr<read_write_lock::RWLock<Directory>>, GetParentParameter> {
     public:
-    using TGetFileParameter<std::weak_ptr<read_write_lock::RWLock<Directory>>, TGetInfoParent>::operator();
-    TGetInfoParent()=default;
+    using GetFileParameter<std::weak_ptr<read_write_lock::RWLock<Directory>>, GetParentParameter>::operator();
+    GetParentParameter()=default;
     const std::weak_ptr<read_write_lock::RWLock<Directory>>& operator()(const FileObjectGuardConcept auto& var) {
-        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->m_pParent;
+        return reinterpret_cast<const File<Directory>*>(var.GetPtr())->FileParent;
     }
     std::weak_ptr<read_write_lock::RWLock<Directory>>& operator()(FileObjectWriteGuardConcept auto& var) {
-        return reinterpret_cast<File<Directory>*>(var.GetPtr())->m_pParent;
+        return reinterpret_cast<File<Directory>*>(var.GetPtr())->FileParent;
     }
 };
 
 template<typename Derived>
-class TGetTimePoint
-    : public TGetFileParameter<std::chrono::system_clock::time_point, Derived>
+class GetTimePointParameter
+    : public GetFileParameter<std::chrono::system_clock::time_point, Derived>
 {
     using base =
-        TGetFileParameter<std::chrono::system_clock::time_point, Derived>;
+        GetFileParameter<std::chrono::system_clock::time_point, Derived>;
 public:
     using base::operator();
 
@@ -91,10 +90,10 @@ public:
 /*------------------------------------------------------------------
  * 1. creation-time (birth-time)
  *-----------------------------------------------------------------*/
-class TGetInfoChanged: public TGetTimePoint<TGetInfoChanged>
+class GetChangedParameter: public GetTimePointParameter<GetChangedParameter>
 {
 public:
-    using TGetTimePoint<TGetInfoChanged>::operator();
+    using GetTimePointParameter<GetChangedParameter>::operator();
     /* read-guard  (const) */
     const std::chrono::system_clock::time_point&
     operator()(const FileObjectGuardConcept auto& var) const
@@ -114,10 +113,10 @@ public:
 /*------------------------------------------------------------------
  * 2. modification-time (mtime)
  *-----------------------------------------------------------------*/
-class TGetInfoModified : public TGetTimePoint<TGetInfoModified>
+class GetModifiedParameter : public GetTimePointParameter<GetModifiedParameter>
 {
 public:
-    using TGetTimePoint<TGetInfoModified>::operator();
+    using GetTimePointParameter<GetModifiedParameter>::operator();
 
     const std::chrono::system_clock::time_point&
     operator()(const FileObjectGuardConcept auto& var) const
@@ -136,10 +135,10 @@ public:
 /*------------------------------------------------------------------
  * 3. access-time (atime)
  *-----------------------------------------------------------------*/
-class TGetInfoAccessed : public TGetTimePoint<TGetInfoAccessed>
+class GetAccessedParameter : public GetTimePointParameter<GetAccessedParameter>
 {
 public:
-    using TGetTimePoint<TGetInfoAccessed>::operator();
+    using GetTimePointParameter<GetAccessedParameter>::operator();
 
     const std::chrono::system_clock::time_point&
     operator()(const FileObjectGuardConcept auto& var) const

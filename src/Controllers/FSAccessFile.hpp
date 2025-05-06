@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-namespace fusevfs::NSAccessFile {
+namespace fusevfs::FSAccessFile {
 
     FileAccessType Access(const std::filesystem::path& path, const int accessMask);
     FileAccessType Access(const FileObjectSharedVariant& var, const int accessMask);

@@ -1,15 +1,15 @@
-#include <Controllers/NSFindFile.hpp>
-#include <Controllers/TFileSystem.hpp>
+#include <Controllers/FindFile.hpp>
+#include <Controllers/FileSystem.hpp>
 #include <Exceptions/FSException.hpp>
-#include <Controllers/TGetFileParameter.hpp>
-#include <Controllers/NSAccessFile.hpp>
+#include <Controllers/GetFileParameter.hpp>
+#include <Controllers/FSAccessFile.hpp>
 
 #include <iostream>
 #include <map>
 
-namespace fusevfs::NSFindFile {
+namespace fusevfs::FindFile {
 
-static constexpr std::string_view s_sRootPath = "/";
+static constexpr std::string_view RootPath = "/";
 static auto s_mNamePath = read_write_lock::RWLock<std::map<std::string, std::set<std::filesystem::path>>>();
 
 FileObjectSharedVariant RecursiveFind(const std::filesystem::path& path,
@@ -21,7 +21,7 @@ FileObjectSharedVariant RecursiveFind(const std::filesystem::path& path,
 
     const auto childIt = std::ranges::find_if(files,
         [&itName](const auto& f) {
-            return std::visit(TGetInfoName{}, f) == itName;
+            return std::visit(GetNameParameter{}, f) == itName;
         }
     );
     if(childIt == files.end()) {
@@ -32,7 +32,7 @@ FileObjectSharedVariant RecursiveFind(const std::filesystem::path& path,
     }
     if(const auto childDirPtr = std::get_if<std::shared_ptr<read_write_lock::RWLock<Directory>>>(&*childIt)) {
         const auto& childDir = *childDirPtr;
-        if(NSAccessFile::Access(childDir, X_OK)==FileAccessType::Restricted) {
+        if(FSAccessFile::Access(childDir, X_OK)==FileAccessType::Restricted) {
             throw FSException(path.begin(), it, ExceptionTypeEnum::AccessNotPermitted);
         }
         return RecursiveFind(path, ++it, childDir->Read());
@@ -40,13 +40,13 @@ FileObjectSharedVariant RecursiveFind(const std::filesystem::path& path,
     throw FSException(path.begin(), it, ExceptionTypeEnum::NotDirectory);
 }
 
-void AddToNameHash(const std::filesystem::path& path) {
+void AddNameToHash(const std::filesystem::path& path) {
     auto namePathWrite = s_mNamePath.Write();
     std::filesystem::path normalPath = path.lexically_normal();
     namePathWrite->operator[](path.filename()).insert(normalPath);
 }
 
-void RemoveFromNameHash(const std::filesystem::path& path) {
+void RemoveNameFromHash(const std::filesystem::path& path) {
     auto namePathWrite = s_mNamePath.Write();
     auto normalPath = path.lexically_normal();
     auto filenamePath = normalPath.filename();
@@ -76,9 +76,9 @@ std::shared_ptr<read_write_lock::RWLock<T>> FindGeneral(const std::filesystem::p
 }
 
 FileObjectSharedVariant Find(const std::filesystem::path& path) {
-    const auto& rootDir = TFileSystem::RootDir();
+    const auto& rootDir = FileSystem::RootDir();
     const auto normalizedPath = path.lexically_normal();
-    if(normalizedPath == s_sRootPath) {
+    if(normalizedPath == RootPath) {
         return rootDir;
     }
     return RecursiveFind(normalizedPath, ++normalizedPath.begin(), rootDir->Read());

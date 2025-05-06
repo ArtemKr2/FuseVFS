@@ -1,5 +1,5 @@
 #include <Models/FileObjects.hpp>
-#include <Controllers/TSetFileParameter.hpp>
+#include <Controllers/SetFileParameter.hpp>
 
 #define FUSE_USE_VERSION 30
 #include <fuse3/fuse.h>
@@ -17,15 +17,15 @@ static std::shared_ptr<read_write_lock::RWLock<T>> DoNew(const std::string& name
         auto objWrite = obj->Write();
         auto now  = std::chrono::system_clock::now();
 
-        TSetInfoModified{now}(objWrite);
-        TSetInfoAccessed{now}(objWrite);
-        TSetInfoChanged{now}(objWrite);
+        SetModifiedParameter{now}(objWrite);
+        SetAccessedParameter{now}(objWrite);
+        SetChangedParameter{now}(objWrite);
 
-        TSetInfoName{name}(objWrite);
-        // TSetInfoMode{mode}(objWrite);
+        SetNameParameter{name}(objWrite);
+        // SeModeParameter{mode}(objWrite);
         const auto context = fuse_get_context();
-        TSetInfoUid{context->uid}(objWrite);
-        TSetInfoGid{context->gid}(objWrite);
+        SetUIDParameter{context->uid}(objWrite);
+        SetGIDParameter{context->gid}(objWrite);
 
         if constexpr(std::same_as<T, Link>) {
             Update(objWrite, args...);
@@ -39,9 +39,9 @@ static std::shared_ptr<read_write_lock::RWLock<T>> DoNew(const std::string& name
             std::same_as<T, RegularFile> ? S_IFREG  :
             std::same_as<T, Link>        ? S_IFLNK  :
                                             0;
-        TSetInfoMode{ FILETYPE | raw_perms }(objWrite, true);
+        SeModeParameter{ FILETYPE | raw_perms }(objWrite, true);
     }
-    TSetInfoParent{parent}(obj);
+    SetParentParameter{parent}(obj);
     return obj;
 }
 

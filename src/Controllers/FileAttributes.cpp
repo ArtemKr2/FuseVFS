@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include <Controllers/NSFileAttributes.hpp>
-#include <Controllers/TGetFileParameter.hpp>
+#include <Controllers/FileAttributes.hpp>
+#include <Controllers/GetFileParameter.hpp>
 
-namespace fusevfs::NSFileAttributes {
+namespace fusevfs::FileAttributes {
 
     inline void FillTimespec(std::chrono::system_clock::time_point tp,
                          timespec& out)
@@ -28,25 +28,16 @@ namespace fusevfs::NSFileAttributes {
         st->st_size = static_cast<off_t>(std::string_view(varRead->LinkTo.c_str()).size());
     }
 
-// void GetGeneral(const FileObjectSharedRWConcept auto& var, struct stat* st) {
-//     const auto varRead = var->Read();
-//     st->st_mode = TGetInfoMode{}(varRead);
-//     st->st_gid = TGetInfoGid{}(varRead);
-//     st->st_uid = TGetInfoUid{}(varRead);
-//     st->st_nlink = var.use_count();
-//     UpdateSize(varRead, st);
-// }
-//
     void GetTotal(const FileObjectSharedRWConcept auto& var, struct stat* st)
     {
         auto rd = var->Read();                     // shared-lock
 
         // type + mode
-        st->st_mode = TGetInfoMode{}(rd);
+        st->st_mode = GetModeParameter{}(rd);
 
         // uid + gid
-        st->st_uid  = TGetInfoUid{}(rd);
-        st->st_gid  =  TGetInfoGid{}(rd);
+        st->st_uid  = GetUIDParameter{}(rd);
+        st->st_gid  =  GetGIDParameter{}(rd);
 
         // update size
         UpdateSize(rd, st);
@@ -71,9 +62,9 @@ namespace fusevfs::NSFileAttributes {
             st->st_nlink = 1;
 
 
-        FillTimespec(TGetInfoChanged{}(var),  st->st_ctim); // ctime / birth
-        FillTimespec(TGetInfoModified{}(var), st->st_mtim); // mtime  (ls -l)
-        FillTimespec(TGetInfoAccessed{}(var), st->st_atim); // atime  (ls -lu)
+        FillTimespec(GetChangedParameter{}(var),  st->st_ctim); // ctime / birth
+        FillTimespec(GetModifiedParameter{}(var), st->st_mtim); // mtime  (ls -l)
+        FillTimespec(GetAccessedParameter{}(var), st->st_atim); // atime  (ls -lu)
     }
 
 void Get(const FileObjectSharedVariant& var, struct stat* st) {

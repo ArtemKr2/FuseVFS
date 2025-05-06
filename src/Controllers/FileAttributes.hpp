@@ -2,7 +2,7 @@
 #include <Models/FileObjects.hpp>
 #include <sys/stat.h>
 
-namespace fusevfs::NSFileAttributes {
+namespace fusevfs::FileAttributes {
     void Get(const FileObjectSharedVariant& var, struct stat* st);
 }
 

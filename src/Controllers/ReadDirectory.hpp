@@ -7,13 +7,13 @@
 
 namespace fusevfs {
 
-class TReadDirectory {
+class ReadDirectory {
 protected:
     const std::filesystem::path& m_pPath;
     void* m_pBuffer = nullptr;
     fuse_fill_dir_t m_xFiller = nullptr;
 public:
-    TReadDirectory(const std::filesystem::path& path, void* buffer, fuse_fill_dir_t filler);
+    ReadDirectory(const std::filesystem::path& path, void* buffer, fuse_fill_dir_t filler);
     void operator()();
 
 protected:

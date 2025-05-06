@@ -1,11 +1,11 @@
 #include <algorithm>
 
-#include <Controllers/NSDeleteFile.hpp>
-#include <Controllers/TGetFileParameter.hpp>
-#include <Controllers/NSFindFile.hpp>
+#include <Controllers/FSDeleteFile.hpp>
+#include <Controllers/GetFileParameter.hpp>
+#include <Controllers/FindFile.hpp>
 #include <Exceptions/FSException.hpp>
 
-namespace fusevfs::NSDeleteFile {
+namespace fusevfs::FSDeleteFile {
 
 void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir, const std::filesystem::path& dirPath);
 
@@ -16,7 +16,7 @@ static void DeleteWithIterator( std::vector<FileObjectSharedVariant>& parentFile
         DeleteChildrenInDirectory(*childDirPtr, itPath);
     }
 
-    NSFindFile::RemoveFromNameHash(itPath);
+    FindFile::RemoveNameFromHash(itPath);
     parentFiles.erase(it);
 }
 
@@ -25,19 +25,19 @@ void DeleteChildrenInDirectory(const std::shared_ptr<read_write_lock::RWLock<Dir
     auto& files = dirWrite->Files;
     for(auto i = unsigned(0); i < files.size(); ++i) {
         const auto it = files.begin() + i;
-        DeleteWithIterator(files, it, dirPath / TGetInfoName{}(*it));
+        DeleteWithIterator(files, it, dirPath / GetNameParameter{}(*it));
         --i;
     }
 }
 
 void Delete(const std::filesystem::path& path) {
     const auto fileName = path.filename();
-    const auto parentDir = NSFindFile::FindDir(path.parent_path());
+    const auto parentDir = FindFile::FindDir(path.parent_path());
     auto parentDirWrite = parentDir->Write();
     auto& parentFiles = parentDirWrite->Files;
     const auto it = std::find_if(parentFiles.begin(), parentFiles.end(),
         [&fileName](const auto& f) {
-            return TGetInfoName{}(f) == fileName;
+            return GetNameParameter{}(f) == fileName;
         }
     );
     if(it == parentFiles.end()) {

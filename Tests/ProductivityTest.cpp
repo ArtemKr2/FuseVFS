@@ -1,5 +1,5 @@
 #include <Views/FSCLI.hpp>
-#include <Controllers/NSFindFile.hpp>
+#include <Controllers/FindFile.hpp>
 #include <gtest/gtest.h>
 
 #include <mntent.h>

@@ -13,7 +13,6 @@ namespace fusevfs {
     class Directory;
     class Link;
 
-
     template<typename T>
     concept FileObjectConcept = std::same_as<T, Directory>
         || std::same_as<T, RegularFile>
@@ -30,7 +29,8 @@ namespace fusevfs {
         || std::same_as<T, read_write_lock::RWLockWriteGuard<Link>>;
 
     template<typename T>
-    concept FileObjectGuardConcept = FileObjectReadGuardConcept<T> || FileObjectWriteGuardConcept<T>;
+    concept FileObjectGuardConcept = FileObjectReadGuardConcept<T>
+                                        || FileObjectWriteGuardConcept<T>;
 
     template<typename T>
     concept FileObjectSharedRWConcept = std::same_as<T, std::shared_ptr<read_write_lock::RWLock<Directory>>>
@@ -59,8 +59,6 @@ namespace fusevfs {
         std::vector<char> Data;
         static constexpr FileTypeEnum FileType = FileTypeEnum::File;
     };
-
-
 
     class Link : File<Directory> {
     public:

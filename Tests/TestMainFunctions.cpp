@@ -21,7 +21,7 @@ static pid_t s_fusePid = -1;
 
 // ——————————————
 
-class TFileSystemTestFixture : public ::testing::Test {
+class FSTest : public ::testing::Test {
 protected:
     static void SetUpTestSuite() {
         std::filesystem::remove_all(MountPoint);
@@ -74,7 +74,7 @@ protected:
     }
 };
 
-TEST_F(TFileSystemTestFixture, RegularFile) {
+TEST_F(FSTest, RegularFile) {
     const auto filePath = MountPoint / std::filesystem::path("text.txt");
     std::ofstream(filePath.c_str()) << "information";
     EXPECT_TRUE(std::filesystem::is_regular_file(filePath));
@@ -83,7 +83,7 @@ TEST_F(TFileSystemTestFixture, RegularFile) {
     EXPECT_EQ(r.find_first_of("information"), 0);
 }
 
-TEST_F(TFileSystemTestFixture, Link) {
+TEST_F(FSTest, Link) {
     const auto filePath = MountPoint / std::filesystem::path("linked");
     std::ofstream give_me_a_name(filePath.c_str());
     const auto linkPath = MountPoint / std::filesystem::path("link");
@@ -92,7 +92,7 @@ TEST_F(TFileSystemTestFixture, Link) {
     EXPECT_EQ(filePath, std::filesystem::read_symlink(linkPath));
 }
 
-TEST_F(TFileSystemTestFixture, Directory) {
+TEST_F(FSTest, Directory) {
     const auto dirPath = MountPoint / std::filesystem::path("dir");
     std::filesystem::create_directory(dirPath);
     EXPECT_TRUE(std::filesystem::is_directory(dirPath));
@@ -117,7 +117,7 @@ TEST_F(TFileSystemTestFixture, Directory) {
     }
 }
 
-TEST_F(TFileSystemTestFixture, FindByName) {
+TEST_F(FSTest, FindByName) {
     std::filesystem::create_directory(std::filesystem::path(MountPoint) / "bar");
     std::filesystem::create_directory(std::filesystem::path(MountPoint) / "bar/bar");
     std::filesystem::create_directory(std::filesystem::path(MountPoint) / "bar/bar/baz");
@@ -130,7 +130,7 @@ TEST_F(TFileSystemTestFixture, FindByName) {
     EXPECT_STREQ(result.c_str(), "/bar/testfile.txt\n");
 }
 
- TEST_F(TFileSystemTestFixture, FileAccess) {
+ TEST_F(FSTest, FileAccess) {
      const auto filePath = std::filesystem::path(MountPoint) / std::filesystem::path("accessFile");
      {
          auto f = std::ofstream(filePath.c_str());
@@ -187,7 +187,7 @@ TEST_F(TFileSystemTestFixture, FindByName) {
      }
  }
 
-  TEST_F(TFileSystemTestFixture, DirectoryAccess) {
+  TEST_F(FSTest, DirectoryAccess) {
       const auto dirPath = std::filesystem::path(MountPoint)  / std::filesystem::path("accessDirectory");
       std::filesystem::create_directory(dirPath);
       {
@@ -256,7 +256,7 @@ TEST_F(TFileSystemTestFixture, FindByName) {
       }
   }
 
- TEST_F(TFileSystemTestFixture, LinkAccess) {
+ TEST_F(FSTest, LinkAccess) {
      const auto linkPath = std::filesystem::path(MountPoint)  / "accessLink";
      const auto filePath = std::filesystem::path(MountPoint)  / "accessLinkFile";
      {

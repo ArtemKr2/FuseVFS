@@ -8,9 +8,8 @@
 namespace fusevfs {
 
     class FSClientCLI final : public CLI::App {
-        std::filesystem::path m_xPipePath;
-        std::string m_sFileName;
-        static constexpr std::string_view s_sError = "Can not open the pipe for writing";
+        std::filesystem::path PipePath;
+        std::string FileName;
 
     public:
         FSClientCLI();

@@ -1,5 +1,5 @@
 #include <Views/FSCLI.hpp>
-#include <Controllers/TFileSystem.hpp>
+#include <Controllers/FileSystem.hpp>
 
 namespace fusevfs {
 
@@ -16,7 +16,7 @@ namespace fusevfs {
             ->required()
             ->check(CLI::ExistingDirectory);
 
-        add_option("-p,--pipe-point", TFileSystem::SocketPath, "UNIX-socket path")
+        add_option("-p,--pipe-point", FileSystem::SocketPath, "UNIX-socket path")
             ->required();
 
         parse_complete_callback([this, fg, offThreads, dbg]() {
@@ -32,7 +32,7 @@ namespace fusevfs {
             args.push_back(m_mountPoint.c_str());
 
             // Запускаем FUSE
-            TFileSystem::Init(
+            FileSystem::Init(
                 static_cast<int>(args.size()),
                 const_cast<char**>(args.data())
             );

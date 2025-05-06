@@ -1,16 +1,15 @@
 #pragma once
 #include <Models/FileObjects.hpp>
-#include <Controllers/NSFileType.hpp>
 #include <iostream>
 
 namespace fusevfs {
 
     template<typename ParamType, typename DerivedType>
-    class TSetInfoParameterMixin {
+    class SetParameterMixin {
     protected:
         const ParamType m_xParam;
     public:
-        explicit TSetInfoParameterMixin(const ParamType& param) : m_xParam{param} {}
+        explicit SetParameterMixin(const ParamType& param) : m_xParam{param} {}
         void operator()(const FileObjectSharedVariant& var) { std::visit(*Self(), var); }
 
         protected:
@@ -22,12 +21,12 @@ namespace fusevfs {
     };
 
     template<typename ParamType, typename DerivedType>
-    class TSetInfoParameterGeneralMixin : public TSetInfoParameterMixin<ParamType, DerivedType> {
+    class SetParameterGeneral : public SetParameterMixin<ParamType, DerivedType> {
     public:
-        explicit TSetInfoParameterGeneralMixin(const ParamType& param)
-            : TSetInfoParameterMixin<ParamType, DerivedType>(param) {}
+        explicit SetParameterGeneral(const ParamType& param)
+            : SetParameterMixin<ParamType, DerivedType>(param) {}
 
-        using TSetInfoParameterMixin<ParamType, DerivedType>::operator();
+        using SetParameterMixin<ParamType, DerivedType>::operator();
         void operator()(const FileObjectSharedRWConcept auto& var) {
             auto varWrite = var->Write();
             this->Self()->operator()(varWrite);
@@ -37,18 +36,18 @@ namespace fusevfs {
     // ────────────────────────────────────────────────────────────────
     //  Accessed  (atime)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoAccessed
-        : public TSetInfoParameterGeneralMixin<
+    class SetAccessedParameter
+        : public SetParameterGeneral<
               std::chrono::system_clock::time_point,
-              TSetInfoAccessed>
+              SetAccessedParameter>
     {
 
-        using Base = TSetInfoParameterGeneralMixin<
+        using Base = SetParameterGeneral<
                          std::chrono::system_clock::time_point,
-                         TSetInfoAccessed>;
+                         SetAccessedParameter>;
 
     public:
-        explicit TSetInfoAccessed(std::chrono::system_clock::time_point tp)
+        explicit SetAccessedParameter(std::chrono::system_clock::time_point tp)
             : Base(tp) {}
 
         using Base::operator();
@@ -61,16 +60,16 @@ namespace fusevfs {
     // ────────────────────────────────────────────────────────────────
     //  Modified  (mtime)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoModified
-        : public TSetInfoParameterGeneralMixin<
+    class SetModifiedParameter
+        : public SetParameterGeneral<
               std::chrono::system_clock::time_point,
-              TSetInfoModified>
+              SetModifiedParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<
+        using Base = SetParameterGeneral<
                          std::chrono::system_clock::time_point,
-                         TSetInfoModified>;
+                         SetModifiedParameter>;
     public:
-        explicit TSetInfoModified(std::chrono::system_clock::time_point tp)
+        explicit SetModifiedParameter(std::chrono::system_clock::time_point tp)
             : Base(tp) {}
 
         using Base::operator();
@@ -83,16 +82,16 @@ namespace fusevfs {
     // ────────────────────────────────────────────────────────────────
     // ctime
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoChanged
-        : public TSetInfoParameterGeneralMixin<
+    class SetChangedParameter
+        : public SetParameterGeneral<
               std::chrono::system_clock::time_point,
-              TSetInfoChanged>
+              SetChangedParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<
+        using Base = SetParameterGeneral<
                          std::chrono::system_clock::time_point,
-                         TSetInfoChanged>;
+                         SetChangedParameter>;
     public:
-        explicit TSetInfoChanged(std::chrono::system_clock::time_point tp)
+        explicit SetChangedParameter(std::chrono::system_clock::time_point tp)
             : Base(tp) {}
 
         using Base::operator();
@@ -103,66 +102,66 @@ namespace fusevfs {
     };
 
     // ────────────────────────────────────────────────────────────────
-    //  Name  (m_sName)
+    //  Name  (FileName)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoName
-        : public TSetInfoParameterGeneralMixin<std::string, TSetInfoName>
+    class SetNameParameter
+        : public SetParameterGeneral<std::string, SetNameParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<std::string, TSetInfoName>;
+        using Base = SetParameterGeneral<std::string, SetNameParameter>;
 
     public:
-        explicit TSetInfoName(const std::string& p) : Base(p) {}
+        explicit SetNameParameter(const std::string& p) : Base(p) {}
 
         using Base::operator();
 
         void operator()(FileObjectWriteGuardConcept auto& g) {
-            this->FileBase(g)->m_sName = m_xParam;
+            this->FileBase(g)->FileName = m_xParam;
         }
     };
 
     // ────────────────────────────────────────────────────────────────
-    //  Uid  (m_uUid)
+    //  Uid  (FileUID)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoUid
-        : public TSetInfoParameterGeneralMixin<uid_t, TSetInfoUid>
+    class SetUIDParameter
+        : public SetParameterGeneral<uid_t, SetUIDParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<uid_t, TSetInfoUid>;
+        using Base = SetParameterGeneral<uid_t, SetUIDParameter>;
     public:
-        explicit TSetInfoUid(uid_t id) : Base(id) {}
+        explicit SetUIDParameter(uid_t id) : Base(id) {}
 
         using Base::operator();
 
         void operator()(FileObjectWriteGuardConcept auto& g) {
-            this->FileBase(g)->m_uUid = m_xParam;
+            this->FileBase(g)->FileUID = m_xParam;
         }
     };
 
     // ────────────────────────────────────────────────────────────────
-    //  Gid  (m_uGid)
+    //  Gid  (FileGID)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoGid
-        : public TSetInfoParameterGeneralMixin<gid_t, TSetInfoGid>
+    class SetGIDParameter
+        : public SetParameterGeneral<gid_t, SetGIDParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<gid_t, TSetInfoGid>;
+        using Base = SetParameterGeneral<gid_t, SetGIDParameter>;
     public:
-        explicit TSetInfoGid(gid_t id) : Base(id) {}
+        explicit SetGIDParameter(gid_t id) : Base(id) {}
 
         using Base::operator();
 
         void operator()(FileObjectWriteGuardConcept auto& g) {
-            this->FileBase(g)->m_uGid = m_xParam;
+            this->FileBase(g)->FileGID = m_xParam;
         }
     };
 
     // ────────────────────────────────────────────────────────────────
-    //  Mode  (m_uMode)
+    //  Mode  (FileMode)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoMode
-        : public TSetInfoParameterGeneralMixin<mode_t, TSetInfoMode>
+    class SeModeParameter
+        : public SetParameterGeneral<mode_t, SeModeParameter>
     {
-        using Base = TSetInfoParameterGeneralMixin<mode_t, TSetInfoMode>;
+        using Base = SetParameterGeneral<mode_t, SeModeParameter>;
     public:
-        explicit TSetInfoMode(mode_t m) : Base(m) { }
+        explicit SeModeParameter(mode_t m) : Base(m) { }
 
         using Base::operator();
 
@@ -172,29 +171,29 @@ namespace fusevfs {
             constexpr mode_t TYPE_MASK = S_IFMT;                  // 0170000
 
             if (is_first) {
-                fileBase->m_uMode = m_xParam;
+                fileBase->FileMode = m_xParam;
             } else {
-                mode_t old_type  = fileBase->m_uMode & TYPE_MASK;
+                mode_t old_type  = fileBase->FileMode & TYPE_MASK;
                 mode_t new_perms = m_xParam  & PERM_MASK;
-                fileBase->m_uMode = old_type | new_perms;
+                fileBase->FileMode = old_type | new_perms;
             }
 
         }
     };
 
     // ────────────────────────────────────────────────────────────────
-    //  Parent  (m_pParent)
+    //  Parent  (FileParent)
     // ────────────────────────────────────────────────────────────────
-    class TSetInfoParent
-        : public TSetInfoParameterMixin<
+    class SetParentParameter
+        : public SetParameterMixin<
               std::shared_ptr<read_write_lock::RWLock<Directory>>,
-              TSetInfoParent>
+              SetParentParameter>
     {
-        using Base = TSetInfoParameterMixin<
+        using Base = SetParameterMixin<
                          std::shared_ptr<read_write_lock::RWLock<Directory>>,
-                         TSetInfoParent>;
+                         SetParentParameter>;
     public:
-        explicit TSetInfoParent(const std::shared_ptr<read_write_lock::RWLock<Directory>>& p)
+        explicit SetParentParameter(const std::shared_ptr<read_write_lock::RWLock<Directory>>& p)
             : Base(p) {}
 
         using Base::operator();
@@ -214,7 +213,7 @@ namespace fusevfs {
     protected:
         void operator()(FileObjectWriteGuardConcept auto& g)
         {
-            this->FileBase(g)->m_pParent = m_xParam;
+            this->FileBase(g)->FileParent = m_xParam;
         }
     };
 
