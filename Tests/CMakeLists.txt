@@ -17,10 +17,8 @@ target_link_libraries(ProductivityTest
         Threads::Threads
 )
 
-# Определяем, куда у нас собрался бинарь FuseVFSMain
 set(FUSE_MAIN_BIN "${CMAKE_BINARY_DIR}/FuseVFSMain")
 
-# Передаём его в код через макрос, если нужно
 target_compile_definitions(TestMainFunctions
         PRIVATE FUSE_MAIN_BIN_PATH="${FUSE_MAIN_BIN}"
 )

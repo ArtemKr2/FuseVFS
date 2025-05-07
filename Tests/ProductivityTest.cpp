@@ -26,7 +26,7 @@ bool is_fuse_mounted(const char* mountpoint) {
     return fsinfo.f_type == 0x65735546;
 }
 
-class TFileSystemTimeTestFixture : public ::testing::Test {
+class FSTestProductivity : public ::testing::Test {
 protected:
 
     static constexpr unsigned s_uMaxDepth = 4;
@@ -98,7 +98,7 @@ protected:
     }
 };
 
-TEST_F(TFileSystemTimeTestFixture, FindFileTimeVFS) {
+TEST_F(FSTestProductivity, FindFileTimeVFS) {
     auto t0 = std::chrono::steady_clock::now();
     const std::string res = fusevfs::FSClientCLI::FindByNameWithSocket(SocketPath, "F");
     auto t1 = std::chrono::steady_clock::now();
@@ -119,7 +119,7 @@ TEST_F(TFileSystemTimeTestFixture, FindFileTimeVFS) {
 }
 
 // 18279
-TEST_F(TFileSystemTimeTestFixture, FindFileTimeGeneralFS) {
+TEST_F(FSTestProductivity, FindFileTimeGeneralFS) {
     auto t0 = std::chrono::steady_clock::now();
     size_t count = std::ranges::count_if(
         std::filesystem::recursive_directory_iterator(s_xTestFolderPath),
