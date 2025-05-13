@@ -362,9 +362,15 @@ namespace fusevfs {
     int FileSystem::ReadDir(const char* path, void* buffer, fuse_fill_dir_t filler, off_t offset,
         struct fuse_file_info* info, enum fuse_readdir_flags flags) {
         try {
-            const auto dir = FindFile::FindDir(path);
+            auto dir = FindFile::FindDir(path);
             SetAccessedParameter{ Clock::now() }( dir );
-            ReadDirectory{path, buffer, filler}();
+
+            ReadDirectory{ std::filesystem::path{path},
+                           buffer,
+                           filler,
+                           offset,
+                           flags }();
+
             return 0;
         } catch(const FSException& ex) {
             return ex.Type();

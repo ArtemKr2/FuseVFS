@@ -53,7 +53,6 @@ protected:
        // std::filesystem::remove_all(s_xTestFolderPath);
        // std::filesystem::create_directory(s_xTestFolderPath);
 
-
         SocketPath = "/tmp/fusevfs.sock";
 
         s_fusePid = fork();
@@ -67,6 +66,7 @@ protected:
             perror("execl");
             _exit(1);
         }
+
         std::this_thread::sleep_for(1s);
         bool mounted = false;
         for (int i = 0; i < 50; ++i) {

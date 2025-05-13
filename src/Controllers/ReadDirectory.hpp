@@ -3,27 +3,27 @@
 
 #include <Models/FileObjects.hpp>
 #include <fuse3/fuse.h>
-#include <string_view>
 
 namespace fusevfs {
 
 class ReadDirectory {
 protected:
-    const std::filesystem::path& m_pPath;
-    void* m_pBuffer = nullptr;
-    fuse_fill_dir_t m_xFiller = nullptr;
+    const std::filesystem::path dirPath;
+    void* Buffer = nullptr;
+    fuse_fill_dir_t dirFiller = nullptr;
+    off_t startCookie;
+    bool wantPlus;
 public:
-    ReadDirectory(const std::filesystem::path& path, void* buffer, fuse_fill_dir_t filler);
+    ReadDirectory(std::filesystem::path path, void* buffer, fuse_fill_dir_t filler, off_t offset,
+                  enum fuse_readdir_flags flags);
     void operator()();
 
 protected:
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var);
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var);
-    void DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var);
+    void ReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var);
+    void ReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var);
+    void ReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var);
 
-
-    void FillerBuffer(const std::string_view& name);
-    void FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir);
+    void FillDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir);
 };
 
 }

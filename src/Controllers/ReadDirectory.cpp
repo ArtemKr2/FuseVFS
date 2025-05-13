@@ -1,41 +1,77 @@
+#include <iostream>
 #include <Controllers/ReadDirectory.hpp>
 #include <Controllers/GetFileParameter.hpp>
 #include <Controllers/FindFile.hpp>
 #include <Exceptions/FSException.hpp>
+#include <Controllers/FileAttributes.hpp>
 
 namespace fusevfs {
 
-    ReadDirectory::ReadDirectory(const std::filesystem::path& path, void* buffer, fuse_fill_dir_t filler)
-        : m_pPath{path}, m_pBuffer{buffer}, m_xFiller{filler} {}
+    ReadDirectory::ReadDirectory(std::filesystem::path p,
+                  void* buf,
+                  fuse_fill_dir_t fill,
+                  off_t offset,
+                  enum fuse_readdir_flags flags)
+        : dirPath{std::move(p)}
+    , Buffer{buf}
+    , dirFiller{fill}
+    , startCookie{offset}
+    , wantPlus{static_cast<bool>(flags & FUSE_READDIR_PLUS)} {}
 
     void ReadDirectory::operator()() {
-        const auto res = FindFile::Find(m_pPath);
-        return std::visit([this](const auto& obj) { return DoReadDir(obj); }, res);
+        std::visit([this](const auto& obj){ ReadDir(obj); }, FindFile::Find(dirPath));
     }
 
-    void ReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var) {
-        FillerDirectory(var);
+    void ReadDirectory::ReadDir(const std::shared_ptr<read_write_lock::RWLock<Directory>>& var) {
+        FillDirectory(var);
     }
 
-    void ReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var) {
-        throw FSException(m_pPath, ExceptionTypeEnum::NotDirectory);
+    void ReadDirectory::ReadDir(const std::shared_ptr<read_write_lock::RWLock<RegularFile>>& var) {
+        throw FSException(dirPath, ExceptionTypeEnum::NotDirectory);
     }
 
-    void ReadDirectory::DoReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var) {
+    void ReadDirectory::ReadDir(const std::shared_ptr<read_write_lock::RWLock<Link>>& var) {
         const auto varRead = var->Read();
         const auto dir = FindFile::FindDir(varRead->LinkTo);
-        FillerDirectory(dir);
+        FillDirectory(dir);
     }
 
-    void ReadDirectory::FillerBuffer(const std::string_view& name) {
-        m_xFiller(m_pBuffer, name.data(), NULL, 0, fuse_fill_dir_flags::FUSE_FILL_DIR_PLUS);
-    }
-
-    void ReadDirectory::FillerDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir) {
+    void ReadDirectory::FillDirectory(const std::shared_ptr<read_write_lock::RWLock<Directory>>& dir) {
         const auto dirRead = dir->Read();
-        for(const auto& var : dirRead->Files) {
+        off_t idx = 0;
+
+        if (startCookie <= idx) {
+            dirFiller(Buffer,
+                      ".",           // имя
+                      nullptr,       // атрибуты (NULL → пусть FUSE добавит default stat)
+                      ++idx,         // cookie для следующего вызова
+                      wantPlus ? FUSE_FILL_DIR_PLUS : (fuse_fill_dir_flags)0);
+        } else {
+            ++idx;
+        }
+
+        if (startCookie <= idx) {
+            dirFiller(Buffer,
+                      "..",
+                      nullptr,
+                      ++idx,
+                      wantPlus ? FUSE_FILL_DIR_PLUS : (fuse_fill_dir_flags)0);
+        } else {
+            ++idx;
+        }
+
+        for (const auto& var : dirRead->Files) {
+            if (startCookie > idx) {
+                ++idx;
+                continue;
+            }
+
             const auto name = GetNameParameter{}(var);
-            FillerBuffer(name);
+            dirFiller(Buffer,
+                      name.data(),
+                      nullptr,
+                      ++idx,
+                      wantPlus ? FUSE_FILL_DIR_PLUS : (fuse_fill_dir_flags)0);
         }
     }
 

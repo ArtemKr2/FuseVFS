@@ -53,7 +53,6 @@ protected:
 
     static void ServerLoop(int server_fd);
 
-    // static void FindByNameThread();
 };
     template<std::integral T>
         constexpr bool IsHasFlag(T value, T flag);
